@@ -5,6 +5,6 @@ self.addEventListener("push", (e) => {
   console.log("Push Received... kiki");
   self.registration.showNotification(data.title, {
     body: "Notified by Me",
-    icon: "http://image.ibb.co/frYOFd/tmlogo.png",
+    icon: "https://image.ibb.co/frYOFd/tmlogo.png",
   });
 });
