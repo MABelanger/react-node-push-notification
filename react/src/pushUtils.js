@@ -15,17 +15,13 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 // Register SW, Register Push, Send Push
-export async function send() {
-  // Register Service Worker
-  console.log("Registering service worker...");
-  const register = await navigator.serviceWorker.register("/worker.js", {
-    scope: "/",
-  });
+
+async function registerPush(reg) {
   console.log("Service Worker Registered...");
 
   // Register push
   console.log("Registering Push ...");
-  const subscription = await register.pushManager.subscribe({
+  const subscription = await reg.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
   });
@@ -41,4 +37,25 @@ export async function send() {
     },
   });
   console.log("Push send...");
+}
+
+export async function send() {
+  // Register Service Worker
+  console.log("Registering service worker...");
+  const register = await navigator.serviceWorker
+    .register("/worker.js", {
+      scope: "/",
+    })
+    .then(async (reg) => {
+      if (reg.installing) {
+        console.log("Service worker installing");
+        await send();
+      } else if (reg.waiting) {
+        console.log("Service worker installed");
+        await send();
+      } else if (reg.active) {
+        console.log("Service worker active");
+        registerPush(reg);
+      }
+    });
 }
